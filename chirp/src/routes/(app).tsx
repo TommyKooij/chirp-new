@@ -55,7 +55,11 @@ export default function AppLayout(props: RouteSectionProps) {
           </NavigationMenuItem>
         </NavigationMenu>
 
-        <Button>Log out</Button>
+        <form action={logout} method="post">
+          <Button name="logout" type="submit">
+            Log out
+          </Button>
+        </form>
       </div>
 
       <main class="col-span-2">{props.children}</main>
