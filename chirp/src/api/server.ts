@@ -20,21 +20,13 @@ function validatePassword(password: unknown) {
 }
 
 async function login(username: string, password: string) {
-  const user = db
-    .select()
-    .from(Users)
-    .where(eq(Users.username, username))
-    .get();
+  const user = db.select().from(Users).where(eq(Users.username, username)).get();
   if (!user || password !== user.password) throw new Error("Invalid login");
   return user;
 }
 
 async function register(username: string, password: string) {
-  const existingUser = db
-    .select()
-    .from(Users)
-    .where(eq(Users.username, username))
-    .get();
+  const existingUser = db.select().from(Users).where(eq(Users.username, username)).get();
   if (existingUser) throw new Error("User already exists");
   return db.insert(Users).values({ username, password }).returning().get();
 }
@@ -42,14 +34,13 @@ async function register(username: string, password: string) {
 function getSession() {
   return useSession({
     name: SESSION_COOKIE_NAME,
-    password:
-      process.env.SESSION_SECRET ?? "areallylongsecretthatyoushouldreplace",
+    password: process.env.SESSION_SECRET ?? "areallylongsecretthatyoushouldreplace",
     cookie: {
       httpOnly: true,
       path: "/",
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    },
+      secure: process.env.NODE_ENV === "production"
+    }
   });
 }
 
@@ -65,7 +56,7 @@ export async function loginOrRegister(formData: FormData) {
       ? register(username, password)
       : login(username, password));
     const session = await getSession();
-    await session.update((d) => {
+    await session.update(d => {
       d.userId = user.id;
     });
   } catch (err) {
@@ -76,7 +67,7 @@ export async function loginOrRegister(formData: FormData) {
 
 export async function logout() {
   const session = await getSession();
-  await session.update((d) => (d.userId = undefined));
+  await session.update(d => (d.userId = undefined));
   throw redirect("/login");
 }
 
